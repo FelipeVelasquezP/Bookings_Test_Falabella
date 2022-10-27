@@ -30,7 +30,6 @@ class Reserva:
             self.id = cs.lastrowid
             c.commit()
         c.close()
-        print(self.id)
         return {"idReserva:":self.id,"idHabitacion":self.habitacion}
 
 
@@ -98,11 +97,9 @@ class Reserva:
                 checkinDeseado,checkoutDeseado=self.formatearFecha(str(self.checkin)),self.formatearFecha(str(self.checkout))
                 if (checkinDeseado>=checkin and checkinDeseado<checkout) \
                 or (checkoutDeseado>checkin and checkoutDeseado<checkout):
-                    print(f'{checkinDeseado} esta entre {checkin} y {checkout}')
                     aux.append(False)
                 else:
                     aux.append(True)
-            print(aux)
             if False not in aux:
                 self.habitacion=habitacion
         else:
