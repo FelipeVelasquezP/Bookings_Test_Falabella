@@ -11,3 +11,5 @@ def create_app(config_class=Config):
 
 
 from app.modelo.modeloReserva import Reserva
+from app.modelo.modeloHotel import Hotel
+from app.modelo.modeloUsuario import Usuario

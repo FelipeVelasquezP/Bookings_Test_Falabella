@@ -1,10 +1,11 @@
 from ast import Return
 from app.modelo.modeloReserva import Reserva
+from app.modelo.modeloHotel import Hotel
+from app.modelo.modeloUsuario import Usuario
 from app.controlador import bp
 from flask import Flask,jsonify,request
 import datetime
 
-# app=Flask(__name__)
 
 @bp.route('/',methods=['GET'])
 def main():
@@ -16,14 +17,19 @@ def crearReserva():
     data = request.get_json()
     checkin=data.get('checkin')
     checkout=data.get('checkout')
-    if validarFechas(checkin,checkout):
-        reserva=Reserva(checkin=checkin,checkout=checkout,usuario=data.get('idUsuario'),idHotel=data.get('idHotel'))
-        reserva.obtenerHabitacionLibre()
-        reserva=reserva.agregarReserva()
-        return {'reservas':reserva,'DataProperties':"Success"}
-    else:
-        return jsonify({'reservas':[],'DataProperties':"Error","descripcion":"checkout debe ser mayor a checkin"})
-        
+    usuario=data.get('idUsuario')
+    hotel=data.get('idHotel')
+    reserva=Reserva(checkin=checkin,checkout=checkout,usuario=usuario,idHotel=hotel)
+    if Usuario(id=usuario).verificarSiExiste() and Hotel(id=hotel).verificarSiExiste():
+        if validarFechas(checkin,checkout):
+            reserva.obtenerHabitacionLibre()
+            reserva=reserva.agregarReserva()
+            return {'reservas':reserva,'DataProperties':"Success"}
+        else:
+            return jsonify({'reservas':[],'DataProperties':"Error","descripcion":"checkout debe ser mayor a checkin"})
+    return {'DataProperties':"Error","description":"El Hotel o Usuario no existen"}        
+
+
 
 @bp.route('/cancelarReserva',methods=['PUT'])
 def cancelarReserva():
