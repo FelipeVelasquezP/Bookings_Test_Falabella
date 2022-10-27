@@ -1,16 +1,34 @@
-from flask_mysqldb import MySQL
-
-class DevelopmentConfig():
-    DEBUG = True
-    MYSQL_HOST = 'localhost'
-    MYSQL_USER = 'root'
-    MYSQL_PASSWORD = '1234'
-    MYSQL_DB = 'prueba2'
-
-    
-
-
-
-config = {
-    'development':DevelopmentConfig
+import pymysql
+DBINFO = {
+    'host' : "localhost",
+    'user' : "root",
+    'password': "1234",
+    'database': "Bookings"
 }
+
+class Conector:
+
+    def __init__(self, host=None, user=None, password=None, database=None):
+        self.host = host
+        self.user = user
+        self.password = password
+        self.database = database
+        self.connection = None
+
+    def connect(self):
+        self.connection = pymysql.connect(
+            host=self.host, user=self.user, password=self.password, database=self.database)
+
+    def execute_query(self, query, data=()):
+        c = self.get_cursor()
+        c.execute(query, data)
+        return c.fetchall()
+
+    def commit_change(self):
+        self.connection.commit()
+
+    def get_cursor(self):
+        return self.connection.cursor()
+
+    def close(self):
+        self.connection.close()
