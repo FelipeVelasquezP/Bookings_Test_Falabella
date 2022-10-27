@@ -6,29 +6,65 @@ DBINFO = {
     'database': "Bookings"
 }
 
-class Conector:
+TYPE_CURSOR =  {
+  "Cursor": None,
+  "SSCursor": pymysql.cursors.SSCursor,
+  "DictCursor": pymysql.cursors.DictCursor,
+  "SSDictCursor": pymysql.cursors.SSDictCursor
+}
 
-    def __init__(self, host=None, user=None, password=None, database=None):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
-        self.connection = None
+class Connection(object):
+  _connection = None
+    
+  def __init__(self):
+    self.host = DBINFO['host']
+    self.user = DBINFO['user']
+    self.password = DBINFO['password']
+    self.database = DBINFO['database']
+    self.conn = pymysql.connect(
+      host=self.host, 
+      user=self.user, 
+      password=self.password, 
+      database=self.database
+    )
 
-    def connect(self):
-        self.connection = pymysql.connect(
-            host=self.host, user=self.user, password=self.password, database=self.database)
+  def __new__(cls, *args, **kwargs):
+    if cls._connection is None:
+      cls._connection = super(Connection, cls).__new__(cls)
+    return cls._connection
 
-    def execute_query(self, query, data=()):
-        c = self.get_cursor()
-        c.execute(query, data)
-        return c.fetchall()
+  def connect(self):
+    if not self.isOpen():
+      self.conn.ping()
 
-    def commit_change(self):
-        self.connection.commit()
+  def close(self):
+    if self.isOpen():
+      self.conn.close()
 
-    def get_cursor(self):
-        return self.connection.cursor()
+  def commit(self):
+    if self.isOpen():
+      self.conn.commit()
 
-    def close(self):
-        self.connection.close()
+  def rollblack(self):
+    if self.isOpen():
+      self.conn.rollback()
+
+  def isOpen(self):
+    return self.conn.open
+
+  def getCursor(self, c="Cursor"):
+    if not self.isOpen():
+      self.connect()
+    return self.conn.cursor(TYPE_CURSOR[c])
+
+if __name__ == '__main__':
+  c1 = Connection()
+  c2 = Connection()
+  print(c1.isOpen())
+  c1.close()
+  print(c2.isOpen())
+  c2.connect()
+  print(c1.isOpen())
+  cc = c1.getCursor("DictCursor")
+  cc.execute("SELECT * FROM Barrio")
+  print(cc.fetchall())

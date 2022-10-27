@@ -1,16 +1,28 @@
+from app.modelo.modeloReserva import Reserva
+from app.controlador import bp
 from flask import Flask,jsonify,request
-from utils.connection import Conector
 
-app=Flask(__name__)
+# app=Flask(__name__)
 
-@app.route('/',methods=['GET'])
-def getdata():
-    return 'HOLA'
+@bp.route('/',methods=['GET'])
+def main():
+    return 'Bienvenido a la API REST de Bookings Falabella'
 
+
+@bp.route('/crearReserva',methods=['POST'])
+def crearReserva():
+    data = request.get_json()
+    return {}
+
+
+@bp.route('/cancelarReserva',methods=['UPDATE'])
+def cancelarReserva():
+    return {}
+
+
+@bp.route('/consultarReservas',methods=['GET'])
+def consultarReservas():
+    return jsonify(Reserva.conultarReservas(1,2))
 
 def exceptRequest(error):
-    return "<h1>error</h1>"
-
-if __name__=='__main__':
-    app.register_error_handler(404,exceptRequest)
-    app.run()
+    return "La petición que intentas realizar es invalida\n"
