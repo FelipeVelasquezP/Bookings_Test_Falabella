@@ -22,10 +22,14 @@ class Reserva:
         return {}
 
     @staticmethod
-    def conultarReservas(checkin,checkout):
-        query = "SELECT * from Reserva"
+    def conultarReservas(checkin,checkout,idHotel):
+        query = "select idReserva,checkin,checkout,fechaReserva,idHabitacion,nombreHotel,emailUsuario \
+                 from Reserva,Usuario,Habitacion,Hotel where idHabitacion=Habitacion_idHabitacion and \
+                 idHotel=Hotel_idHotel and idUsuario=Usuario_idUsuario and estadoReserva='reservado' and\
+                 checkin between %s and %s and checkout between %s and %s and idHotel=%s;"
+                 
         cc = Connection().getCursor("DictCursor")
-        r = cc.execute(query)
+        r = cc.execute(query,(checkin,checkout,checkin,checkout,idHotel))
         cc.close()
         if r:
             return cc.fetchall()
