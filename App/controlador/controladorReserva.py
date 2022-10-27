@@ -29,8 +29,6 @@ def crearReserva():
             return jsonify({'reservas':[],'DataProperties':"Error","descripcion":"checkout debe ser mayor a checkin"})
     return {'DataProperties':"Error","description":"El Hotel o Usuario no existen"}        
 
-
-
 @bp.route('/cancelarReserva',methods=['PUT'])
 def cancelarReserva():
     data = request.get_json()

@@ -1,5 +1,3 @@
-
-
 #Datos de preba para Hoteles 
 insert into Hotel values(null,'Santa Clara','Colombia',43.43,895.3542,'des1',true);
 insert into Hotel values(null,'Blue Suits','EEUU',413.43,89.352,'des2',true);
@@ -38,35 +36,31 @@ insert into Reserva values(null,'2022-6-11','2022-6-15',utc_date(),'reservado','
 insert into Reserva values(null,'2022-6-13','2022-6-14',utc_date(),'reservado','1002549404',4) ;
 insert into Reserva values(null,'2022-6-19','2022-6-24',utc_date(),'reservado','1002549404',5) ;
 insert into Reserva values(null,'2022-6-28','2022-6-30',utc_date(),'reservado','1002549404',5) ;
-insert into Reserva values(null,'2022-7-12','2022-7-15',utc_date(),'reservado','1002549404',5) ;
+
 select*from Reserva;
+
+
 -- -----------------------------------------------------
 -- Registrar una reserva dado usurio, hotel y checkin y checkout
 -- -----------------------------------------------------
+#Buscar las habitacione a las que nuncan se le han hecho reserva
+SELECT  idHabitacion FROM habitacion
+ WHERE Hotel_idHotel=1 and  idHabitacion NOT IN (SELECT Habitacion_idHabitacion FROM Reserva);
 
-#Saber que habitacion tomar
-select  idHabitacion from Reserva,Habitacion 
-					  where (('2022-7-15' not between checkin and date_sub(checkout,interval 1 DAY))
-					  and   ('2022-7-20' not between date_sub(checkin,interval 1 DAY) and checkout)
-                      and idHabitacion=Habitacion_idHabitacion and Hotel_idHotel=2)
-                      or (idHabitacion!=Habitacion_idHabitacion and Hotel_idHotel=2) limit 1;
-                      
-                      
-                      
-#registrar la reserva con el primero que se encuentre
-insert into Reserva values(null,'2022-7-15','2022-7-20',utc_date(),'reservado','1002549404',1) ;
+SELECT distinct idHabitacion FROM Reserva,Habitacion
+WHERE Hotel_idHotel=2 and Habitacion_idHabitacion=idHabitacion;
+
 
 -- -----------------------------------------------------
 -- cancelar la reserva
 -- -----------------------------------------------------
 #actualizar el estado de la habitación 
-update Reserva set estadoReserva="cancelado",checkin='0000-0-00',checkout='0000-0-00' where idReserva=2;
+update Reserva set estadoReserva="cancelado",checkin='1677-09-21',checkout='1677-09-21' where idReserva=2;
 
 -- -----------------------------------------------------
 -- consultar reservas activas en un rango de fechas
 -- -----------------------------------------------------
 #traer info de reserva, nombre de hotel y mail de usuario
-
 select idReserva,checkin,checkout,fechaReserva,idHabitacion,nombreHotel,emailUsuario from Reserva,Usuario,Habitacion,Hotel
 where idHabitacion=Habitacion_idHabitacion and idHotel=Hotel_idHotel and idUsuario=Usuario_idUsuario 
 and estadoReserva='reservado' and checkin between '2022-6-10' and '2022-7-13'
