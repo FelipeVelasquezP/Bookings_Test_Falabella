@@ -14,12 +14,29 @@ def main():
 @bp.route('/crearReserva',methods=['POST'])
 def crearReserva():
     data = request.get_json()
-    return {}
+    checkin=data.get('checkin')
+    checkout=data.get('checkout')
+    if validarFechas(checkin,checkout):
+        reserva=Reserva(checkin=checkin,checkout=checkout,usuario=data.get('idUsuario'),idHotel=data.get('idHotel'))
+        reserva.obtenerHabitacionLibre()
+        reserva=reserva.agregarReserva()
+        return {'reservas':reserva,'DataProperties':"Success"}
+    else:
+        return jsonify({'reservas':[],'DataProperties':"Error","descripcion":"checkout debe ser mayor a checkin"})
+        
 
-
-@bp.route('/cancelarReserva',methods=['UPDATE'])
+@bp.route('/cancelarReserva',methods=['PUT'])
 def cancelarReserva():
-    return {}
+    data = request.get_json()
+    reserva=Reserva(id=data.get('idReserva'))
+    if reserva.verificarSiExiste():
+        if reserva.cancelarReserva():
+            return {'idReserva':reserva.id,'DataProperties':"Success"}
+        else:
+            return {'DataProperties':"Error"}
+    else:
+        return {'DataProperties':"Error","description":"La reserva no existe"}
+
 
 
 @bp.route('/consultarReservas',methods=['GET'])
@@ -28,7 +45,8 @@ def consultarReservas():
     checkin=data.get('checkin')
     checkout=data.get('checkout')
     if validarFechas(checkin,checkout):
-        reservas=Reserva.conultarReservas(checkin,checkout,data.get('idHotel'))
+        reserva=Reserva(checkin=checkin,checkout=checkout,idHotel=data.get('idHotel'))
+        reservas=reserva.conultarReservas()
         return jsonify({'reservas':reservas,'DataProperties':"Success"})
     else:
         return jsonify({'reservas':[],'DataProperties':"Error","descripcion":"checkout debe ser mayor a checkin"})
