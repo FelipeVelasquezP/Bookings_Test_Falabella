@@ -3,8 +3,6 @@ import sys
 import datetime
 from tkinter import TRUE
 sys.path.append('../utils')
-
-
 from app.utils.conector import Conector,DBINFO
 from app.utils.connection import Connection
 
@@ -47,10 +45,10 @@ class Reserva:
         query = "select idReserva,checkin,checkout,fechaReserva,idHabitacion,nombreHotel,emailUsuario \
                  from Reserva,Usuario,Habitacion,Hotel where idHabitacion=Habitacion_idHabitacion and \
                  idHotel=Hotel_idHotel and idUsuario=Usuario_idUsuario and estadoReserva='reservado' and\
-                 checkin between %s and %s and checkout between %s and %s and idHotel=%s;"
+                 checkin between %s and %s and idHotel=%s;"
 
         cc = Connection().getCursor("DictCursor")
-        r = cc.execute(query,(self.checkin,self.checkout,self.checkin,self.checkout,self.idHotel))
+        r = cc.execute(query,(self.checkin,self.checkout,self.idHotel))
         cc.close()
         if r:
             return cc.fetchall()
@@ -59,21 +57,22 @@ class Reserva:
     def obtenerHabitacionLibre(self):
         query = "SELECT idHabitacion FROM habitacion\
         WHERE Hotel_idHotel=%s and  idHabitacion NOT IN (SELECT Habitacion_idHabitacion FROM Reserva);"
-                 
         cc = Connection().getCursor("DictCursor")
         r = cc.execute(query,(self.idHotel))
         cc.close()
         if r:
             self.habitacion= cc.fetchall()[0]['idHabitacion']
         else:
-            habitaciones=self.obtener_habitaciones()
+            habitaciones=self.obtenerHabitacionesHotel()
             for habitacion in habitaciones:
                 self.validarDisponibilidad(habitacion['idHabitacion'])
                 if self.habitacion !=None:
                     return
             self.habitacion=0
 
-    def obtener_habitaciones(self):
+
+
+    def obtenerHabitacionesHotel(self):
         query = "SELECT distinct idHabitacion FROM Reserva,Habitacion\
         WHERE Hotel_idHotel=%s and Habitacion_idHabitacion=idHabitacion"
         cc = Connection().getCursor("DictCursor")
@@ -82,8 +81,9 @@ class Reserva:
         if r:
             return cc.fetchall()
         else:
-            print('**********NO HAY HABITACIONES********')
             return []
+
+
 
     def validarDisponibilidad(self,habitacion):
         query = "select checkin,checkout from Reserva where Habitacion_idHabitacion=%s"         
@@ -108,7 +108,6 @@ class Reserva:
 
     def verificarSiExiste(self):
         query = "select idReserva from Reserva where idReserva=%s"
-                 
         cc = Connection().getCursor("DictCursor")
         r = cc.execute(query,(self.id))
         cc.close()

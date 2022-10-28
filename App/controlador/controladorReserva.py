@@ -1,4 +1,3 @@
-from ast import Return
 from app.modelo.modeloReserva import Reserva
 from app.modelo.modeloHotel import Hotel
 from app.modelo.modeloUsuario import Usuario
@@ -7,27 +6,35 @@ from flask import Flask,jsonify,request
 import datetime
 
 
+errores={
+    "400": {'codigoError':400,'DataProperties':"Error","description":"Eror en Fechas(checkin menor a checkout o checkin menor a checkin)"}
+    "401": {'codigoError':401,'DataProperties':"Error","description":"El Hotel, Usuario o Reserva no existen"}      
+    "402": {'codigoError':402,'DataProperties':"Error","description":"Accion no realizada"}
+}
+
+
 @bp.route('/',methods=['GET'])
 def main():
     return 'Bienvenido a la API REST de Bookings Falabella'
 
 
+
 @bp.route('/crearReserva',methods=['POST'])
 def crearReserva():
     data = request.get_json()
-    checkin=data.get('checkin')
-    checkout=data.get('checkout')
-    usuario=data.get('idUsuario')
-    hotel=data.get('idHotel')
+    checkin,checkout,usuario,hotel=data.get('checkin'),data.get('checkout'),\
+                                   data.get('idUsuario'),data.get('idHotel')
     reserva=Reserva(checkin=checkin,checkout=checkout,usuario=usuario,idHotel=hotel)
     if Usuario(id=usuario).verificarSiExiste() and Hotel(id=hotel).verificarSiExiste():
-        if validarFechas(checkin,checkout):
+        if validarFechas(checkin,checkout) and (formatearFecha(checkin) > datetime.date.today()):
             reserva.obtenerHabitacionLibre()
             reserva=reserva.agregarReserva()
-            return {'reservas':reserva,'DataProperties':"Success"}
+            return {'reserva':reserva,'DataProperties':"Success"}
         else:
-            return jsonify({'reservas':[],'DataProperties':"Error","descripcion":"checkout debe ser mayor a checkin"})
-    return {'DataProperties':"Error","description":"El Hotel o Usuario no existen"}        
+            return errores["400"]
+    return errores["401"]
+
+
 
 @bp.route('/cancelarReserva',methods=['PUT'])
 def cancelarReserva():
@@ -37,32 +44,36 @@ def cancelarReserva():
         if reserva.cancelarReserva():
             return {'idReserva':reserva.id,'DataProperties':"Success"}
         else:
-            return {'DataProperties':"Error"}
+            return errores["402"]
     else:
-        return {'DataProperties':"Error","description":"La reserva no existe"}
+        return errores["401"]
+
 
 
 
 @bp.route('/consultarReservas',methods=['GET'])
 def consultarReservas():
     data = request.get_json()
-    checkin=data.get('checkin')
-    checkout=data.get('checkout')
-    if validarFechas(checkin,checkout):
-        reserva=Reserva(checkin=checkin,checkout=checkout,idHotel=data.get('idHotel'))
-        reservas=reserva.conultarReservas()
-        return jsonify({'reservas':reservas,'DataProperties':"Success"})
+    checkin,checkout=data.get('checkin'),data.get('checkout')
+    hotel=data.get('idHotel')
+    if Hotel(id=hotel).verificarSiExiste():
+        if validarFechas(checkin,checkout):
+            reserva=Reserva(checkin=checkin,checkout=checkout,idHotel=hotel)
+            reservas=reserva.conultarReservas()
+            return jsonify({'reservas':reservas,'DataProperties':"Success"})
+        else:
+            return errores["400"]
     else:
-        return jsonify({'reservas':[],'DataProperties':"Error","descripcion":"checkout debe ser mayor a checkin"})
-        
+        return errores["402"]       
+    
+
+
 
 def formatearFecha(fecha):
     indices=fecha.split('-')
-    return datetime.datetime(int(indices[0]),int(indices[1]), int(indices[2])) 
-
+    return datetime.date(int(indices[0]),int(indices[1]), int(indices[2])) 
 def validarFechas(checkin,checkout):
     if formatearFecha(checkin) <= formatearFecha(checkout):
         return True
     else:
         return False
-
