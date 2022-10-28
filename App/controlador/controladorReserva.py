@@ -1,14 +1,15 @@
 from app.modelo.modeloReserva import Reserva
 from app.modelo.modeloHotel import Hotel
 from app.modelo.modeloUsuario import Usuario
+from app.modelo.modeloHabitacion import Habitacion
 from app.controlador import bp
 from flask import Flask,jsonify,request
 import datetime
 
 
 errores={
-    "400": {'codigoError':400,'DataProperties':"Error","description":"Eror en Fechas(checkin menor a checkout o checkin menor a checkin)"}
-    "401": {'codigoError':401,'DataProperties':"Error","description":"El Hotel, Usuario o Reserva no existen"}      
+    "400": {'codigoError':400,'DataProperties':"Error","description":"Eror en Fechas(checkin menor a checkout o checkin menor a checkin)"},
+    "401": {'codigoError':401,'DataProperties':"Error","description":"El Hotel, Usuario o Reserva no existen"},
     "402": {'codigoError':402,'DataProperties':"Error","description":"Accion no realizada"}
 }
 
@@ -27,7 +28,7 @@ def crearReserva():
     reserva=Reserva(checkin=checkin,checkout=checkout,usuario=usuario,idHotel=hotel)
     if Usuario(id=usuario).verificarSiExiste() and Hotel(id=hotel).verificarSiExiste():
         if validarFechas(checkin,checkout) and (formatearFecha(checkin) > datetime.date.today()):
-            reserva.obtenerHabitacionLibre()
+            Habitacion(reserva).obtenerHabitacionLibre()
             reserva=reserva.agregarReserva()
             return {'reserva':reserva,'DataProperties':"Success"}
         else:
