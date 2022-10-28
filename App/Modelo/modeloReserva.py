@@ -36,7 +36,7 @@ class Reserva:
     def agregarReserva(self):
         #cuando el id de la habitacion es 0, quere decir que no hay habitaciones disponibles
         if self.habitacion==0:
-            return {"Error":"No hay habitaciones disponibles para estas fechas"} # se retorna la advertencia
+            return "No hay habitaciones disponibles para estas fechas" # se retorna la advertencia
         query = "insert into Reserva values(null,%s,%s,utc_date(),'reservado',%s,%s);" # Se crea el insert para crear la reserva
         c = Connection() # se crea la conexión
         cs = c.getCursor() # se obtiene el cursor

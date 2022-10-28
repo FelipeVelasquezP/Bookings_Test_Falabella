@@ -10,14 +10,14 @@ insert into Habitacion values(null,2);
 insert into Habitacion values(null,2);
 insert into Habitacion values(null,1);
 insert into Habitacion values(null,2);
+insert into Habitacion values(null,1);
+insert into Habitacion values(null,1);
+insert into Habitacion values(null,3);
+insert into Habitacion values(null,3);
+insert into Habitacion values(null,3);
+insert into Habitacion values(null,4);
+insert into Habitacion values(null,4);
 insert into Habitacion values(null,2);
-insert into Habitacion values(null,2);
-insert into Habitacion values(null,3);
-insert into Habitacion values(null,3);
-insert into Habitacion values(null,3);
-insert into Habitacion values(null,4);
-insert into Habitacion values(null,4);
-insert into Habitacion values(null,4);
 #select*from Habitacion;
 
 #Datos de prueba para Usuarios 
@@ -32,10 +32,10 @@ insert into Usuario values ('837983','Lorena','Alvarez','fus','loalvare@mail.com
 #select*from Usuario;
 
 #Datos de prueba para reservas
-insert into Reserva values(null,'2022-6-11','2022-6-15',utc_date(),'reservado','1002549404',3) ;
-insert into Reserva values(null,'2022-6-13','2022-6-14',utc_date(),'reservado','1002549404',4) ;
-insert into Reserva values(null,'2022-6-19','2022-6-24',utc_date(),'reservado','1002549404',5) ;
-insert into Reserva values(null,'2022-6-28','2022-6-30',utc_date(),'reservado','1002549404',5) ;
+insert into Reserva values(null,'2022-11-11','2022-11-15',utc_date(),'reservado','1002549404',3) ;
+insert into Reserva values(null,'2022-11-13','2022-11-14',utc_date(),'reservado','1002549404',4) ;
+insert into Reserva values(null,'2022-11-19','2022-11-24',utc_date(),'reservado','1002549404',5) ;
+insert into Reserva values(null,'2022-11-28','2022-11-30',utc_date(),'reservado','1002549404',5) ;
 
 select*from Reserva;
 
